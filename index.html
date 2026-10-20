@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Second Fortune</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#0d1020;--card:#171b33;--card2:#1f2442;--txt:#eef0ff;--mut:#8f95c0;--gold:#ffc83d;--grn:#35d07f;--red:#ff5d6c;--blu:#5b8cff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:30px}
+#app{max-width:480px;margin:0 auto}
+.hero{position:relative;height:170px;overflow:hidden;border-radius:0 0 22px 22px}
+.hero svg{position:absolute;inset:0;width:100%;height:100%}
+.avatar{position:absolute;left:16px;bottom:10px;font-size:54px;filter:drop-shadow(0 4px 6px #0008);animation:bob 2.5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.title{position:absolute;right:14px;top:12px;text-align:right;text-shadow:0 2px 6px #000a}
+.title b{font-size:15px}.title div{font-size:12px;opacity:.9}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px}
+.stat{background:var(--card);border-radius:14px;padding:10px;text-align:center}
+.stat small{display:block;color:var(--mut);font-size:11px}
+.stat b{font-size:16px}
+.nw b{color:var(--gold)}
+.bar{height:8px;background:var(--card2);border-radius:6px;margin:0 12px 6px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blu),var(--gold));border-radius:6px;transition:width .5s}
+.goal{font-size:11px;color:var(--mut);padding:0 14px 8px}
+.card{background:var(--card);border-radius:16px;margin:10px 12px;padding:12px}
+.fs{background:linear-gradient(135deg,#2a1f5c,#16305c);border:1px solid #5b8cff55;animation:glow 3s infinite}
+@keyframes glow{50%{box-shadow:0 0 16px #5b8cff55}}
+.fs small{color:#9db8ff;letter-spacing:1px;font-size:10px}
+.fs div{font-size:14px;margin-top:4px}
+.asset{display:flex;align-items:center;gap:10px;margin:0}
+.asset+.asset{margin-top:12px;padding-top:12px;border-top:1px solid #ffffff12}
+.ai{font-size:28px}
+.am{flex:1;min-width:0}
+.am b{font-size:14px}.am small{color:var(--mut);display:block;font-size:11px}
+.up{color:var(--grn)}.dn{color:var(--red)}
+.spark{width:70px;height:30px}
+.btns{display:flex;gap:6px;margin-top:6px}
+button{font:inherit;border:0;border-radius:11px;padding:9px 12px;color:#fff;background:var(--card2);font-size:13px;cursor:pointer}
+button:active{transform:scale(.96)}
+.b-buy{background:#1f6b49}.b-sell{background:#7a2a36}
+.b-main{background:linear-gradient(135deg,#3a6cff,#7a4dff);width:100%;padding:13px;font-size:15px;font-weight:600}
+.b-gold{background:linear-gradient(135deg,#ffb02e,#ff7a18);color:#1a1000;font-weight:700}
+.act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.act button{padding:12px 8px}
+.act button[disabled]{opacity:.35}
+.log{font-size:12px;color:var(--mut);line-height:1.5;max-height:120px;overflow:auto}
+h3{margin:0 0 8px;font-size:14px}
+.modal{position:fixed;inset:0;background:#000b;display:flex;align-items:flex-end;justify-content:center;z-index:9;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--card);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:18px 16px 24px;animation:up .25s}
+@keyframes up{from{transform:translateY(40px)}}
+.sheet h2{margin:0 0 4px;font-size:18px}
+.sheet .ch{color:var(--gold);font-size:12px;margin-bottom:8px}
+.sheet p{line-height:1.55;font-size:14px;margin:8px 0 14px}
+.sheet button{display:block;width:100%;margin-top:8px;padding:12px;text-align:left;background:var(--card2)}
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000d;padding:8px 14px;border-radius:20px;font-size:13px;z-index:20}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const tg = window.Telegram && window.Telegram.WebApp;
+if (tg) { tg.ready(); tg.expand(); try{tg.setHeaderColor('#0d1020');tg.setBackgroundColor('#0d1020');}catch(e){} }
+
+const KEY = 'second_fortune_v1', DAYS = 365;
+const THRESH = [0, 1e3, 1e4, 1e5, 1e6, 1e7];
+
+// ---------- STORY ----------
+const CH = [
+ { name:'Chapter 1: The Broke Student', inc:15, work:'Deliver food', icon:'🧑‍🎓', sky:['#1b2a55','#3a4a8c'],
+   scene:{ text:"You die at 40 — broke, alone, regretting every missed chance. Then you wake up in your cramped room at 19. The calendar says January. You have $100... and clear memories of what the market will do this year. This time, you won't waste it.",
+     choices:[
+      {l:'📱 Sell your old phone for quick cash', cash:50, res:'You sell it for $50. Every dollar is a seed now.'},
+      {l:'📚 Study how markets move', rep:6, res:'You fill a notebook. Your future-memories finally make sense.'}]}},
+ { name:'Chapter 2: First Hustle', inc:120, work:'Run your side shop', icon:'🧑‍💼', sky:['#2b2260','#7a4d9c'],
+   scene:{ text:"You've hit $1,000. Your landlord, Mr. Hale, notices your new confidence. 'I own the empty shop downstairs,' he says. 'Split the profits with me and it's yours.'",
+     choices:[
+      {l:'🤝 Accept the partnership', cashPct:.5, rep:8, res:'The shop takes off. Mr. Hale becomes your first ally.'},
+      {l:'🚫 Decline and keep investing alone', cashPct:.15, res:'You keep full control, but miss some easy money.'}]}},
+ { name:'Chapter 3: The Young Founder', inc:1000, work:'Run your startup', icon:'👔', sky:['#12354d','#2f7f9c'],
+   scene:{ text:"$10,000. A small company of your own. A rival founder, Victor Crane, offers to buy you out for a quick payout — he's heard rumors you 'always pick winners'.",
+     choices:[
+      {l:'💰 Take the buyout offer', cashPct:.4, rep:-5, res:'Quick cash, but Victor now knows how good you are.'},
+      {l:'⚔️ Refuse and grow stronger', rep:12, cashPct:.1, res:'Victor frowns. Word spreads that you cannot be bought.'},
+      {l:'🕵️ Pretend to negotiate, learn his secrets', rep:6, cashPct:.2, res:'You learn exactly where his weaknesses are.'}]}},
+ { name:'Chapter 4: Rising Tycoon', inc:9000, work:'Run your company', icon:'🕴️', sky:['#3a1a3f','#a33b6a'],
+   scene:{ text:"$100,000. Magazines call you 'the lucky kid'. A powerful group — the Crane family — invites you to a private dinner. They want you at their table... or out of the game.",
+     choices:[
+      {l:'🍷 Attend the dinner', rep:15, cashPct:.1, res:'You smile, listen, and leave with their respect and a deal.'},
+      {l:'📰 Go public with your plans', rep:10, cashPct:.25, res:'The press loves you. The Cranes do not.'},
+      {l:'🛡️ Quietly build alliances', rep:20, res:'Three small firms swear loyalty to you.'}]}},
+ { name:'Chapter 5: The Empire Builder', inc:70000, work:'Run your empire', icon:'🤵', sky:['#4a2a10','#d98a2b'],
+   scene:{ text:"$1,000,000. The Crane family's holding company is overleveraged — and you know exactly when it will collapse. Do you strike, or stay patient?",
+     choices:[
+      {l:'🗡️ Short their company before it falls', cashPct:.6, rep:-8, res:'Their fall is your gain. Fear follows your name.'},
+      {l:'🏗️ Buy their assets cheaply after the crash', cashPct:.35, rep:15, res:'You rebuild what they wrecked and gain loyal workers.'}]}},
+ { name:'Final: The Throne', inc:300000, work:'Rule your empire', icon:'👑', sky:['#3d2d00','#ffc83d'],
+   scene:{ text:"$10,000,000. Banks, companies, politicians — they all return your calls now. The boy who died broke has become one of the most powerful people alive. In your first life you had nothing. In this one, you chose everything. 👑 YOU WIN. Keep playing to push your empire further, or start a new life.",
+     choices:[{l:'👑 Continue as king of the market', rep:25, res:'The story goes on...'}]}}
+];
+
+const EVENTS = [
+ {t:'🚨 A pickpocket got you!', cashPct:-.08},
+ {t:'🍀 You found a lucky envelope on the street.', cashPct:.06, min:10},
+ {t:'🧾 Surprise tax bill arrives.', cashPct:-.05},
+ {t:'📣 A viral post about you brings fans.', rep:5},
+ {t:'🐍 A scammer tries to trick you. You spot it thanks to your foresight!', rep:3},
+ {t:'🎁 A grateful customer sends a bonus.', cashPct:.04, min:20},
+ {t:'🔧 Equipment breaks. Repairs cost you.', cashPct:-.04}
+];
+
+// ---------- MARKET (deterministic so foresight is always true) ----------
+const ASSETS = [
+ {id:'tech', name:'NovaTech', icon:'💻', vol:.05, drift:.004},
+ {id:'shop', name:'Corner Mart', icon:'🏪', vol:.025, drift:.002},
+ {id:'coin', name:'MoonCoin', icon:'🪙', vol:.10, drift:0}
+];
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function buildPrices(seed){
+ const r = rng(seed), out = {};
+ ASSETS.forEach(a=>{
+  const p=[10];
+  for(let i=1;i<DAYS+8;i++) p.push(Math.max(1,p[i-1]*(1+a.drift+a.vol*(r()*2-1))));
+  for(let e=0;e<8;e++){
+   const s=Math.floor(r()*(DAYS-6))+2, m=(r()<.55?1:-1)*(.25+r()*.4);
+   for(let i=s;i<p.length;i++) p[i]=Math.max(1,p[i]*Math.pow(1+m,Math.min(i-s+1,3)/3));
+  }
+  out[a.id]=p;
+ });
+ return out;
+}
+
+// ---------- STATE ----------
+function newGame(){return{day:1,cash:100,ap:3,rep:0,hold:{tech:0,shop:0,coin:0},chap:-1,seed:Math.floor(Math.random()*1e9),log:['Day 1: You wake up with $100 and memories of the future.'],over:false}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.seed?s:null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let S = load() || newGame();
+let P = buildPrices(S.seed);
+let modal = null;
+
+const price = (id,d=S.day)=>P[id][d];
+const netWorth = ()=>S.cash + ASSETS.reduce((s,a)=>s+S.hold[a.id]*price(a.id),0);
+const fmt = n => { const a=Math.abs(n); if(a>=1e9) return '$'+(n/1e9).toFixed(2)+'B'; if(a>=1e6) return '$'+(n/1e6).toFixed(2)+'M'; if(a>=1e4) return '$'+(n/1e3).toFixed(1)+'K'; return '$'+n.toLocaleString(undefined,{maximumFractionDigits:2}); };
+function addLog(t){S.log.unshift(t); S.log=S.log.slice(0,40)}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1600)}
+function haptic(){try{tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred('light')}catch(e){}}
+
+function foresight(){
+ let best=null;
+ ASSETS.forEach(a=>{
+  const ch=P[a.id][S.day+3]/P[a.id][S.day]-1;
+  if(!best||Math.abs(ch)>Math.abs(best.ch)) best={a,ch};
+ });
+ return best;
+}
+
+// ---------- GRAPHICS (all drawn by code) ----------
+function skyline(chap){
+ const c=Math.max(0,chap), sky=CH[c].sky, r=rng(7), n=6+c*3;
+ let b='';
+ const w=360/n;
+ for(let i=0;i<n;i++){
+  const h=30+r()*(30+c*18), x=i*w, y=170-h;
+  b+=`<rect x="${x}" y="${y}" width="${w-2}" height="${h}" fill="#0b0e1f" opacity="${.55+r()*.4}"/>`;
+  for(let wy=y+6;wy<165;wy+=9)for(let wx=x+3;wx<x+w-6;wx+=7) if(r()>.55) b+=`<rect x="${wx}" y="${wy}" width="3" height="4" fill="#ffd978" opacity=".8"/>`;
+ }
+ let stars='';for(let i=0;i<25;i++)stars+=`<circle cx="${r()*360}" cy="${r()*70}" r="${r()*1.2+.3}" fill="#fff" opacity="${.3+r()*.6}"/>`;
+ return `<svg viewBox="0 0 360 170" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="360" height="170" fill="url(#g)"/>${stars}<circle cx="300" cy="36" r="14" fill="#fff6d0" opacity=".9"/>${b}</svg>`;
+}
+function spark(id){
+ const s=Math.max(1,S.day-19), pts=[];
+ for(let d=s;d<=S.day;d++)pts.push(price(id,d));
+ const mn=Math.min(...pts),mx=Math.max(...pts),rg=(mx-mn)||1;
+ const xy=pts.map((v,i)=>`${(i/(Math.max(1,pts.length-1)))*70},${28-((v-mn)/rg)*26}`).join(' ');
+ const up=pts[pts.length-1]>=pts[0];
+ return `<svg class="spark" viewBox="0 0 70 30"><polyline points="${xy}" fill="none" stroke="${up?'#35d07f':'#ff5d6c'}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+}
+
+// ---------- RENDER ----------
+function render(){
+ const c=Math.max(0,S.chap), nw=netWorth(), ch=CH[c];
+ const next=THRESH[Math.min(c+1,THRESH.length-1)], prev=THRESH[c];
+ const pct=c>=5?100:Math.min(100,Math.max(0,(nw-prev)/(next-prev)*100));
+ const fs=foresight();
+ const dir=fs.ch>=0?'rise':'fall';
+ let html=`
+ <div class="hero">${skyline(c)}<div class="avatar">${ch.icon}</div>
+  <div class="title"><b>${ch.name}</b><div>Day ${Math.min(S.day,DAYS)} / ${DAYS}</div></div></div>
+ <div class="stats">
+  <div class="stat nw"><small>NET WORTH</small><b>${fmt(nw)}</b></div>
+  <div class="stat"><small>CASH</small><b>${fmt(S.cash)}</b></div>
+  <div class="stat"><small>REPUTATION</small><b>⭐ ${Math.round(S.rep)}</b></div>
+ </div>
+ <div class="bar"><i style="width:${pct}%"></i></div>
+ <div class="goal">${c>=5?'You reached the top! 👑':'Next chapter at '+fmt(next)}</div>
+ <div class="card fs"><small>🔮 TODAY'S FORESIGHT</small>
+  <div><b>${fs.a.icon} ${fs.a.name}</b> will <b class="${fs.ch>=0?'up':'dn'}">${dir} about ${Math.abs(Math.round(fs.ch*100))}%</b> over the next 3 days.</div></div>
+ <div class="card"><h3>📈 Market</h3>`;
+ ASSETS.forEach(a=>{
+  const p=price(a.id), prevp=price(a.id,Math.max(1,S.day-1)), chg=(p/prevp-1)*100;
+  html+=`<div class="asset"><div class="ai">${a.icon}</div>
+   <div class="am"><b>${a.name}</b><small>You own ${fmt(S.hold[a.id]*p)} · <span class="${chg>=0?'up':'dn'}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(1)}%</span></small>
+   <div class="btns"><button class="b-buy" data-a="buy" data-v="${a.id}:.25">Buy 25%</button><button class="b-buy" data-a="buy" data-v="${a.id}:1">Buy All</button><button class="b-sell" data-a="sell" data-v="${a.id}">Sell All</button></div></div>
+   <div style="text-align:right">${spark(a.id)}<small style="color:var(--mut)">${fmt(p)}</small></div></div>`;
+ });
+ const inc=Math.round(ch.inc*(1+S.rep/100));
+ html+=`</div>
+ <div class="card"><h3>⚡ Actions (${S.ap} left today)</h3>
+  <div class="act">
+   <button data-a="work" ${S.ap<1?'disabled':''}>💼 ${ch.work}<br><small>+${fmt(inc)}</small></button>
+   <button data-a="net" ${S.ap<1?'disabled':''}>🤝 Network<br><small>+4 reputation</small></button>
+  </div></div>
+ <div class="card"><button class="b-main" data-a="end">🌙 End Day ➜</button></div>
+ <div class="card"><h3>📜 Story log</h3><div class="log">${S.log.map(x=>'• '+x).join('<br>')}</div></div>
+ <div class="card"><button data-a="reset" style="width:100%;background:#2a2f55">🔄 New life</button></div>`;
+ if(modal) html+=modalHtml();
+ document.getElementById('app').innerHTML=html;
+}
+function modalHtml(){
+ const m=modal;
+ if(m.result) return `<div class="modal"><div class="sheet"><div class="ch">${m.head}</div><p>${m.result}</p><button data-a="close" class="b-gold" style="text-align:center">Continue ➜</button></div></div>`;
+ return `<div class="modal"><div class="sheet"><div class="ch">${m.head}</div><p>${m.text}</p>${m.choices.map((c,i)=>`<button data-a="choice" data-v="${i}">${c.l}</button>`).join('')}</div></div>`;
+}
+
+// ---------- GAME LOGIC ----------
+function checkChapter(){
+ if(modal||S.over&&S.chap>=5) return;
+ const nw=netWorth();
+ let t=-1; THRESH.forEach((v,i)=>{if(nw>=v)t=i});
+ if(t>S.chap){
+  S.chap++;
+  const sc=CH[S.chap].scene;
+  modal={head:CH[S.chap].name,text:sc.text,choices:sc.choices,chap:S.chap};
+  haptic();
+ }
+}
+function applyEffect(e){
+ if(e.cash) S.cash+=e.cash;
+ if(e.cashPct){ let d=S.cash*e.cashPct; if(e.min&&d>0) d=Math.max(d,e.min); S.cash+=d; }
+ if(e.rep) S.rep=Math.max(0,S.rep+e.rep);
+ if(S.cash<0) S.cash=0;
+}
+function endDay(){
+ if(S.over && S.day>=DAYS) return;
+ S.day++; S.ap=3;
+ const f=foresight();
+ addLog(`Day ${S.day}: A new day begins.`);
+ if(Math.random()<.18){
+  const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
+  applyEffect(ev); addLog(ev.t); toast(ev.t);
+ }
+ if(S.day>=DAYS){
+  S.over=true;
+  const nw=netWorth();
+  const rank=nw>=1e7?'a legend 👑':nw>=1e6?'a millionaire 💎':nw>=1e5?'a rising tycoon 📈':'still hustling 💪';
+  modal={head:'One year later',result:`Your year is over. Final net worth: ${fmt(nw)} — you are ${rank}. Start a new life to try a different path!`,final:true};
+ }
+ haptic(); save(); checkChapter(); render();
+}
+function act(a,v){
+ haptic();
+ if(modal && a!=='choice' && a!=='close' && a!=='reset') return;
+ if(a==='work'){ if(S.ap<1) return; S.ap--; const inc=Math.round(CH[Math.max(0,S.chap)].inc*(1+S.rep/100)); S.cash+=inc; addLog(`You earned ${fmt(inc)}.`); toast('+'+fmt(inc)); }
+ else if(a==='net'){ if(S.ap<1) return; S.ap--; S.rep+=4; addLog('You networked. +4 reputation.'); toast('+4 ⭐'); }
+ else if(a==='buy'){ const [id,pc]=v.split(':'); const spend=S.cash*parseFloat(pc); if(spend<1){toast('Not enough cash');return} S.hold[id]+=spend/price(id); S.cash-=spend; addLog(`Bought ${fmt(spend)} of ${ASSETS.find(x=>x.id===id).name}.`); }
+ else if(a==='sell'){ const val=S.hold[v]*price(v); if(val<1){toast('Nothing to sell');return} S.cash+=val; S.hold[v]=0; addLog(`Sold ${ASSETS.find(x=>x.id===v).name} for ${fmt(val)}.`); }
+ else if(a==='end'){ endDay(); return; }
+ else if(a==='choice'){
+  const c=modal.choices[+v]; applyEffect(c); addLog(c.l.replace(/^\S+\s/,'')+' — '+c.res);
+  modal={head:modal.head,result:c.res};
+  save(); render(); return;
+ }
+ else if(a==='close'){ const fin=modal&&modal.final; modal=null; save(); if(!fin) checkChapter(); render(); return; }
+ else if(a==='reset'){ if(confirm('Start a brand-new life? Your progress will be lost.')){ S=newGame(); P=buildPrices(S.seed); modal=null; save(); checkChapter(); render(); } return; }
+ save(); checkChapter(); render();
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]'); if(b&&!b.disabled) act(b.dataset.a,b.dataset.v)});
+
+checkChapter(); render();
+</script>
+</body>
+</html>
