@@ -11,16 +11,18 @@
 body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:30px}
 #app{max-width:480px;margin:0 auto}
 .hero{position:relative;height:170px;overflow:hidden;border-radius:0 0 22px 22px}
-.hero svg{position:absolute;inset:0;width:100%;height:100%}
-.avatar{position:absolute;left:16px;bottom:10px;font-size:54px;filter:drop-shadow(0 4px 6px #0008);animation:bob 2.5s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-5px)}}
+.hero>svg.sky{position:absolute;inset:0;width:100%;height:100%}
+.avatar{position:absolute;left:12px;bottom:0;animation:bob 2.5s ease-in-out infinite;filter:drop-shadow(0 4px 6px #0008)}
+@keyframes bob{50%{transform:translateY(-4px)}}
 .title{position:absolute;right:14px;top:12px;text-align:right;text-shadow:0 2px 6px #000a}
 .title b{font-size:15px}.title div{font-size:12px;opacity:.9}
-.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 12px 6px}
 .stat{background:var(--card);border-radius:14px;padding:10px;text-align:center}
 .stat small{display:block;color:var(--mut);font-size:11px}
 .stat b{font-size:16px}
 .nw b{color:var(--gold)}
+.chips{display:flex;gap:8px;padding:0 12px 8px;flex-wrap:wrap}
+.chip{background:var(--card2);border-radius:20px;padding:4px 10px;font-size:11px;color:#c9cdf0}
 .bar{height:8px;background:var(--card2);border-radius:6px;margin:0 12px 6px;overflow:hidden}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blu),var(--gold));border-radius:6px;transition:width .5s}
 .goal{font-size:11px;color:var(--mut);padding:0 14px 8px}
@@ -29,7 +31,7 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,Se
 @keyframes glow{50%{box-shadow:0 0 16px #5b8cff55}}
 .fs small{color:#9db8ff;letter-spacing:1px;font-size:10px}
 .fs div{font-size:14px;margin-top:4px}
-.asset{display:flex;align-items:center;gap:10px;margin:0}
+.asset{display:flex;align-items:center;gap:10px}
 .asset+.asset{margin-top:12px;padding-top:12px;border-top:1px solid #ffffff12}
 .ai{font-size:28px}
 .am{flex:1;min-width:0}
@@ -44,18 +46,30 @@ button:active{transform:scale(.96)}
 .b-gold{background:linear-gradient(135deg,#ffb02e,#ff7a18);color:#1a1000;font-weight:700}
 .act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .act button{padding:12px 8px}
-.act button[disabled]{opacity:.35}
+button[disabled]{opacity:.35}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 12px}
+.row2 button{padding:12px 8px;background:var(--card);border:1px solid #ffffff14}
+.biz{display:flex;align-items:center;gap:10px}
+.biz+.biz{margin-top:10px;padding-top:10px;border-top:1px solid #ffffff12}
+.biz .ai{font-size:26px}
+.biz .am small{font-size:11px}
+.biz button{background:#2c3a8f;min-width:92px;font-size:12px;padding:8px}
+.biz.locked{opacity:.4}
 .log{font-size:12px;color:var(--mut);line-height:1.5;max-height:120px;overflow:auto}
 h3{margin:0 0 8px;font-size:14px}
 .modal{position:fixed;inset:0;background:#000b;display:flex;align-items:flex-end;justify-content:center;z-index:9;animation:fade .2s}
 @keyframes fade{from{opacity:0}}
-.sheet{background:var(--card);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:18px 16px 24px;animation:up .25s}
+.sheet{background:var(--card);width:100%;max-width:480px;max-height:85vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px 24px;animation:up .25s}
 @keyframes up{from{transform:translateY(40px)}}
-.sheet h2{margin:0 0 4px;font-size:18px}
-.sheet .ch{color:var(--gold);font-size:12px;margin-bottom:8px}
+.sheet .ch{color:var(--gold);font-size:13px;margin-bottom:8px;font-weight:600}
 .sheet p{line-height:1.55;font-size:14px;margin:8px 0 14px}
 .sheet button{display:block;width:100%;margin-top:8px;padding:12px;text-align:left;background:var(--card2)}
-.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000d;padding:8px 14px;border-radius:20px;font-size:13px;z-index:20}
+.lb{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid #ffffff10;font-size:14px}
+.lb.me{background:#ffc83d18;border-radius:8px}
+.lb .rk{width:28px;text-align:center}
+.lb .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb .vl{color:var(--gold);font-weight:600}
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#000d;padding:8px 14px;border-radius:20px;font-size:13px;z-index:20;max-width:90%;text-align:center}
 </style>
 </head>
 <body>
@@ -64,40 +78,66 @@ h3{margin:0 0 8px;font-size:14px}
 const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) { tg.ready(); tg.expand(); try{tg.setHeaderColor('#0d1020');tg.setBackgroundColor('#0d1020');}catch(e){} }
 
-const KEY = 'second_fortune_v1', DAYS = 365;
-const THRESH = [0, 1e3, 1e4, 1e5, 1e6, 1e7];
+// ===================== SETTINGS =====================
+const BOT = 'SecondFortune_bot', APP = 'Play';
+// Leaderboard + referrals: paste your Cloudflare Worker address here (see the setup guide). Leave empty to run without them.
+// Example: 'https://second-fortune-api.yourname.workers.dev'
+const API_URL = '';
+const CLOUD_KEY = 'sf_save';
+// ====================================================
+
+const KEY = 'second_fortune_v2', DAYS = 365;
+const THRESH = [0, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 5e8, 1e9];
 
 // ---------- STORY ----------
 const CH = [
- { name:'Chapter 1: The Broke Student', inc:15, work:'Deliver food', icon:'🧑‍🎓', sky:['#1b2a55','#3a4a8c'],
+ { name:'Chapter 1: The Broke Student', inc:15, work:'Deliver food', sky:['#1b2a55','#3a4a8c'], look:{suit:'#5a6aa0',tie:null,hair:'#1d1a2e'},
    scene:{ text:"You die at 40 — broke, alone, regretting every missed chance. Then you wake up in your cramped room at 19. The calendar says January. You have $100... and clear memories of what the market will do this year. This time, you won't waste it.",
      choices:[
       {l:'📱 Sell your old phone for quick cash', cash:50, res:'You sell it for $50. Every dollar is a seed now.'},
       {l:'📚 Study how markets move', rep:6, res:'You fill a notebook. Your future-memories finally make sense.'}]}},
- { name:'Chapter 2: First Hustle', inc:120, work:'Run your side shop', icon:'🧑‍💼', sky:['#2b2260','#7a4d9c'],
+ { name:'Chapter 2: First Hustle', inc:100, work:'Run your side shop', sky:['#2b2260','#7a4d9c'], look:{suit:'#3b4a7a',tie:'#ffc83d',hair:'#1d1a2e'},
    scene:{ text:"You've hit $1,000. Your landlord, Mr. Hale, notices your new confidence. 'I own the empty shop downstairs,' he says. 'Split the profits with me and it's yours.'",
      choices:[
       {l:'🤝 Accept the partnership', cashPct:.5, rep:8, res:'The shop takes off. Mr. Hale becomes your first ally.'},
       {l:'🚫 Decline and keep investing alone', cashPct:.15, res:'You keep full control, but miss some easy money.'}]}},
- { name:'Chapter 3: The Young Founder', inc:1000, work:'Run your startup', icon:'👔', sky:['#12354d','#2f7f9c'],
+ { name:'Chapter 3: The Young Founder', inc:800, work:'Run your startup', sky:['#12354d','#2f7f9c'], look:{suit:'#2f3f5f',tie:'#ff5d6c',hair:'#1d1a2e'},
    scene:{ text:"$10,000. A small company of your own. A rival founder, Victor Crane, offers to buy you out for a quick payout — he's heard rumors you 'always pick winners'.",
      choices:[
       {l:'💰 Take the buyout offer', cashPct:.4, rep:-5, res:'Quick cash, but Victor now knows how good you are.'},
       {l:'⚔️ Refuse and grow stronger', rep:12, cashPct:.1, res:'Victor frowns. Word spreads that you cannot be bought.'},
       {l:'🕵️ Pretend to negotiate, learn his secrets', rep:6, cashPct:.2, res:'You learn exactly where his weaknesses are.'}]}},
- { name:'Chapter 4: Rising Tycoon', inc:9000, work:'Run your company', icon:'🕴️', sky:['#3a1a3f','#a33b6a'],
+ { name:'Chapter 4: Rising Tycoon', inc:6000, work:'Run your company', sky:['#3a1a3f','#a33b6a'], look:{suit:'#1f2a44',tie:'#5b8cff',hair:'#1d1a2e'},
    scene:{ text:"$100,000. Magazines call you 'the lucky kid'. A powerful group — the Crane family — invites you to a private dinner. They want you at their table... or out of the game.",
      choices:[
       {l:'🍷 Attend the dinner', rep:15, cashPct:.1, res:'You smile, listen, and leave with their respect and a deal.'},
       {l:'📰 Go public with your plans', rep:10, cashPct:.25, res:'The press loves you. The Cranes do not.'},
       {l:'🛡️ Quietly build alliances', rep:20, res:'Three small firms swear loyalty to you.'}]}},
- { name:'Chapter 5: The Empire Builder', inc:70000, work:'Run your empire', icon:'🤵', sky:['#4a2a10','#d98a2b'],
+ { name:'Chapter 5: The Empire Builder', inc:45000, work:'Run your empire', sky:['#4a2a10','#d98a2b'], look:{suit:'#16202f',tie:'#ffc83d',hair:'#1d1a2e'},
    scene:{ text:"$1,000,000. The Crane family's holding company is overleveraged — and you know exactly when it will collapse. Do you strike, or stay patient?",
      choices:[
       {l:'🗡️ Short their company before it falls', cashPct:.6, rep:-8, res:'Their fall is your gain. Fear follows your name.'},
       {l:'🏗️ Buy their assets cheaply after the crash', cashPct:.35, rep:15, res:'You rebuild what they wrecked and gain loyal workers.'}]}},
- { name:'Final: The Throne', inc:300000, work:'Rule your empire', icon:'👑', sky:['#3d2d00','#ffc83d'],
-   scene:{ text:"$10,000,000. Banks, companies, politicians — they all return your calls now. The boy who died broke has become one of the most powerful people alive. In your first life you had nothing. In this one, you chose everything. 👑 YOU WIN. Keep playing to push your empire further, or start a new life.",
+ { name:'Chapter 6: Global Player', inc:300000, work:'Close global deals', sky:['#0f3b3a','#2fb59b'], look:{suit:'#111827',tie:'#35d07f',hair:'#1d1a2e'},
+   scene:{ text:"$10,000,000. Foreign investors fly in to meet the mysterious young genius. A sovereign fund offers a huge partnership — with strings attached.",
+     choices:[
+      {l:'✍️ Sign the partnership', cashPct:.3, rep:10, res:'Money floods in. So do expectations.'},
+      {l:'🧠 Negotiate harder', cashPct:.15, rep:18, res:'They respect you more for it, and the deal improves.'},
+      {l:'🏳️ Walk away and stay independent', rep:25, res:'Your freedom is intact. Your legend grows.'}]}},
+ { name:'Chapter 7: Shadow Rulers', inc:2000000, work:'Steer the market', sky:['#2a1030','#5a2a7a'], look:{suit:'#1b1b2b',tie:'#b57bff',hair:'#2b2b3f'},
+   scene:{ text:"$100,000,000. Politicians now ask for your opinion. A senator hints that a generous donation could buy you 'friendly regulation'.",
+     choices:[
+      {l:'🤫 Pay quietly', cashPct:-.1, rep:-10, res:'Doors open, but a journalist starts digging.'},
+      {l:'📢 Refuse and expose the offer', rep:25, cashPct:-.05, res:'The public cheers. Powerful people quietly take notes.'},
+      {l:'🎓 Fund a public university instead', rep:20, cashPct:-.08, res:'Your name now sits on a building, and in people\'s hearts.'}]}},
+ { name:'Chapter 8: The Kingmaker', inc:12000000, work:'Move the world', sky:['#3a0f1c','#b3202f'], look:{suit:'#2a1730',tie:'#ffc83d',hair:'#2b2b3f'},
+   scene:{ text:"$500,000,000. Victor Crane returns, broken and begging for one last deal. In your first life, his schemes helped ruin you.",
+     choices:[
+      {l:'⚰️ Crush him for good', cashPct:.2, rep:-10, res:'He is finished. You feel less than you expected.'},
+      {l:'🤝 Offer a fair deal', rep:30, cashPct:.1, res:'The world sees a leader, not a predator.'},
+      {l:'💼 Hire him as an employee', rep:20, cashPct:.15, res:'He works for you now. Some enemies make the best staff.'}]}},
+ { name:'Final: The Throne', inc:60000000, work:'Rule the world economy', sky:['#3d2d00','#ffc83d'], look:{suit:'#3a0f1c',tie:'#ffc83d',hair:'#2b2b3f'},
+   scene:{ text:"$1,000,000,000. Banks, companies, governments — they all return your calls now. The boy who died broke has become one of the most powerful people alive. In your first life you had nothing. In this one, you chose everything. 👑 YOU WIN! Keep playing to push your empire even further, or start a new life.",
      choices:[{l:'👑 Continue as king of the market', rep:25, res:'The story goes on...'}]}}
 ];
 
@@ -106,10 +146,26 @@ const EVENTS = [
  {t:'🍀 You found a lucky envelope on the street.', cashPct:.06, min:10},
  {t:'🧾 Surprise tax bill arrives.', cashPct:-.05},
  {t:'📣 A viral post about you brings fans.', rep:5},
- {t:'🐍 A scammer tries to trick you. You spot it thanks to your foresight!', rep:3},
+ {t:'🐍 A scammer tried to trick you. Your foresight saved you!', rep:3},
  {t:'🎁 A grateful customer sends a bonus.', cashPct:.04, min:20},
  {t:'🔧 Equipment breaks. Repairs cost you.', cashPct:-.04}
 ];
+
+// ---------- BUSINESSES (passive income per day) ----------
+const BIZ = [
+ {id:'cart',  name:'Food Cart',          icon:'🌭', ch:0, cost:300,    inc:10},
+ {id:'wash',  name:'Laundromat',         icon:'🧺', ch:1, cost:3000,   inc:90},
+ {id:'cafe',  name:'Café Chain',         icon:'☕', ch:2, cost:25000,  inc:800},
+ {id:'tech',  name:'Tech Startup',       icon:'🚀', ch:3, cost:200000, inc:7000},
+ {id:'fact',  name:'Factory',            icon:'🏭', ch:4, cost:1.5e6,  inc:55000},
+ {id:'bank',  name:'Investment Bank',    icon:'🏦', ch:5, cost:12e6,   inc:450000},
+ {id:'media', name:'Media Empire',       icon:'📺', ch:6, cost:100e6,  inc:3.5e6},
+ {id:'globe', name:'Global Conglomerate',icon:'🌐', ch:7, cost:800e6,  inc:30e6}
+];
+const MAXLV = 10;
+const bizCost = (b,lv)=>Math.round(b.cost*Math.pow(1.8,lv));
+function bizValue(){ let v=0; BIZ.forEach(b=>{for(let k=0;k<(S.biz[b.id]||0);k++)v+=bizCost(b,k)}); return v; }
+function bizIncome(){ return BIZ.reduce((s,b)=>s+(S.biz[b.id]||0)*b.inc,0); }
 
 // ---------- MARKET (deterministic so foresight is always true) ----------
 const ASSETS = [
@@ -123,8 +179,8 @@ function buildPrices(seed){
  ASSETS.forEach(a=>{
   const p=[10];
   for(let i=1;i<DAYS+8;i++) p.push(Math.max(1,p[i-1]*(1+a.drift+a.vol*(r()*2-1))));
-  for(let e=0;e<8;e++){
-   const s=Math.floor(r()*(DAYS-6))+2, m=(r()<.55?1:-1)*(.25+r()*.4);
+  for(let e=0;e<12;e++){
+   const s=Math.floor(r()*(DAYS-6))+2, up=r()<.6, m=up?(.35+r()*.9):-(.2+r()*.35);
    for(let i=s;i<p.length;i++) p[i]=Math.max(1,p[i]*Math.pow(1+m,Math.min(i-s+1,3)/3));
   }
   out[a.id]=p;
@@ -133,19 +189,32 @@ function buildPrices(seed){
 }
 
 // ---------- STATE ----------
-function newGame(){return{day:1,cash:100,ap:3,rep:0,hold:{tech:0,shop:0,coin:0},chap:-1,seed:Math.floor(Math.random()*1e9),log:['Day 1: You wake up with $100 and memories of the future.'],over:false}}
+const todayStr = ()=>new Date().toLocaleDateString('en-CA');
+function newGame(old){
+ old = old||{};
+ return {day:1,cash:100,ap:3,rep:0,hold:{tech:0,shop:0,coin:0},biz:{},chap:-1,
+  seed:Math.floor(Math.random()*1e9),log:['Day 1: You wake up with $100 and memories of the future.'],over:false,
+  uid:old.uid||0,best:old.best||0,streak:old.streak||1,lastLogin:old.lastLogin||todayStr(),refBy:old.refBy||0,refClaimed:old.refClaimed||0};
+}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.seed?s:null}catch(e){return null}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){ S.ts=Date.now(); try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){} cloudSaveSoon(); }
 let S = load() || newGame();
+if(!S.biz) S.biz={};
+const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+if(tgUser && tgUser.id) S.uid = tgUser.id;
+if(!S.uid) S.uid = Math.floor(1e12 + Math.random()*9e12);
 let P = buildPrices(S.seed);
-let modal = null;
+let modal = null, queue = [], booted = false, cloudTimer = null;
 
 const price = (id,d=S.day)=>P[id][d];
-const netWorth = ()=>S.cash + ASSETS.reduce((s,a)=>s+S.hold[a.id]*price(a.id),0);
+const netWorth = ()=>S.cash + bizValue() + ASSETS.reduce((s,a)=>s+S.hold[a.id]*price(a.id),0);
 const fmt = n => { const a=Math.abs(n); if(a>=1e9) return '$'+(n/1e9).toFixed(2)+'B'; if(a>=1e6) return '$'+(n/1e6).toFixed(2)+'M'; if(a>=1e4) return '$'+(n/1e3).toFixed(1)+'K'; return '$'+n.toLocaleString(undefined,{maximumFractionDigits:2}); };
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function addLog(t){S.log.unshift(t); S.log=S.log.slice(0,40)}
-function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1600)}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
 function haptic(){try{tg&&tg.HapticFeedback&&tg.HapticFeedback.impactOccurred('light')}catch(e){}}
+function showModal(m){ if(modal) queue.push(m); else modal=m; }
+const myName = ()=> (tgUser && (tgUser.first_name||tgUser.username)) ? String(tgUser.first_name||tgUser.username).slice(0,20) : 'Player'+String(S.uid).slice(-4);
 
 function foresight(){
  let best=null;
@@ -156,24 +225,115 @@ function foresight(){
  return best;
 }
 
-// ---------- GRAPHICS (all drawn by code) ----------
-function skyline(chap){
- const c=Math.max(0,chap), sky=CH[c].sky, r=rng(7), n=6+c*3;
- let b='';
- const w=360/n;
- for(let i=0;i<n;i++){
-  const h=30+r()*(30+c*18), x=i*w, y=170-h;
-  b+=`<rect x="${x}" y="${y}" width="${w-2}" height="${h}" fill="#0b0e1f" opacity="${.55+r()*.4}"/>`;
-  for(let wy=y+6;wy<165;wy+=9)for(let wx=x+3;wx<x+w-6;wx+=7) if(r()>.55) b+=`<rect x="${wx}" y="${wy}" width="3" height="4" fill="#ffd978" opacity=".8"/>`;
+// ---------- CLOUD SAVE (Telegram CloudStorage: free and built into Telegram) ----------
+const cloudOn = ()=>!!(tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9'));
+function cloudSaveSoon(){ if(!cloudOn()||!booted) return; clearTimeout(cloudTimer); cloudTimer=setTimeout(cloudSaveNow,2000); }
+function cloudSaveNow(){
+ if(!cloudOn()) return;
+ try{
+  const txt=JSON.stringify(Object.assign({},S,{log:S.log.slice(0,6)}));
+  if(txt.length<3900) tg.CloudStorage.setItem(CLOUD_KEY,txt,function(){});
+ }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) cloudSaveNow(); });
+
+// ---------- ONLINE (Cloudflare Worker): leaderboard + referrals ----------
+const apiOn = ()=>!!(API_URL && tg && tg.initData);
+async function api(path,body){
+ const r=await fetch(API_URL+path,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({initData:tg.initData},body||{}))});
+ if(!r.ok) throw new Error('HTTP '+r.status);
+ return r.json();
+}
+let lastSync=0;
+function handleReferrals(n){
+ if(n>(S.refClaimed||0)){
+  const k=n-(S.refClaimed||0); S.refClaimed=n;
+  const bonus=Math.round(CH[Math.max(0,S.chap)].inc*20*k);
+  S.cash+=bonus; addLog(`${k} friend(s) joined through your link: +${fmt(bonus)}!`);
+  showModal({head:'👥 Referral reward',text:`${k} friend${k>1?'s':''} joined through your link! You earned ${fmt(bonus)}.`,btn:'Awesome ➜'});
+  save(); render();
  }
- let stars='';for(let i=0;i<25;i++)stars+=`<circle cx="${r()*360}" cy="${r()*70}" r="${r()*1.2+.3}" fill="#fff" opacity="${.3+r()*.6}"/>`;
- return `<svg viewBox="0 0 360 170" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="360" height="170" fill="url(#g)"/>${stars}<circle cx="300" cy="36" r="14" fill="#fff6d0" opacity=".9"/>${b}</svg>`;
+}
+async function syncPlayer(force){
+ if(!apiOn()) return null;
+ const now=Date.now(); if(!force && now-lastSync<15000) return null; lastSync=now;
+ S.best=Math.max(S.best||0,netWorth());
+ try{
+  const res=await api('/sync',{best:S.best,day:S.day,chapter:Math.max(0,S.chap)});
+  if(res && typeof res.referrals==='number') handleReferrals(res.referrals);
+  return res;
+ }catch(e){ return null; }
+}
+async function initOnline(){
+ if(!apiOn()) return;
+ await syncPlayer(true);
+ const sp = tg.initDataUnsafe && tg.initDataUnsafe.start_param;
+ if(sp && /^ref_\d+$/.test(sp) && !S.refBy){
+  const rid=parseInt(sp.slice(4),10);
+  if(rid && rid!==S.uid){
+   try{
+    const rr=await api('/referral',{ref:rid});
+    S.refBy=rid;
+    if(rr && rr.accepted){
+     S.cash+=300; addLog('A friend invited you: +$300 welcome bonus!');
+     showModal({head:'🤝 Welcome bonus',text:'A friend invited you to Second Fortune. Here is $300 to start your new life!',btn:'Nice ➜'});
+    }
+    save(); render();
+   }catch(e){}
+  }
+ }
+}
+async function openLeaderboard(){
+ const m={head:'🏆 Leaderboard',lb:true,rows:null,err:false,rank:0};
+ showModal(m); render();
+ if(!apiOn()) return;
+ try{ const res=await api('/leaderboard'); m.rows=res.rows||[]; m.rank=res.rank||0; }
+ catch(e){ m.err=true; }
+ if(modal===m) render();
+}
+function invite(){
+ const link=`https://t.me/${BOT}/${APP}?startapp=ref_${S.uid}`;
+ const text='Join me in Second Fortune — turn $100 into an empire! 💰';
+ const url='https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(text);
+ if(tg && tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url,'_blank');
+}
+
+// ---------- GRAPHICS (all drawn by code) ----------
+function skyline(c){
+ const sky=CH[c].sky, r=rng(7), n=Math.min(24,6+c*2);
+ let b=''; const w=360/n;
+ for(let i=0;i<n;i++){
+  const h=30+r()*(30+c*10), x=i*w, y=170-h;
+  b+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(w-2).toFixed(1)}" height="${h.toFixed(1)}" fill="#0b0e1f" opacity="${(.55+r()*.4).toFixed(2)}"/>`;
+  for(let wy=y+6;wy<165;wy+=9)for(let wx=x+3;wx<x+w-6;wx+=7) if(r()>.55) b+=`<rect x="${wx.toFixed(1)}" y="${wy.toFixed(1)}" width="3" height="4" fill="#ffd978" opacity=".8"/>`;
+ }
+ let stars='';for(let i=0;i<25;i++)stars+=`<circle cx="${(r()*360).toFixed(1)}" cy="${(r()*70).toFixed(1)}" r="${(r()*1.2+.3).toFixed(2)}" fill="#fff" opacity="${(.3+r()*.6).toFixed(2)}"/>`;
+ return `<svg class="sky" viewBox="0 0 360 170" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="360" height="170" fill="url(#g)"/>${stars}<circle cx="300" cy="36" r="14" fill="#fff6d0" opacity=".9"/>${b}</svg>`;
+}
+function character(c){
+ const L=CH[c].look, skin='#f1c9a0';
+ let s=`<svg class="avatar" viewBox="0 0 100 124" width="92" height="114">`;
+ if(c>=7) s+=`<path d="M10 124 Q6 86 30 74 L70 74 Q94 86 90 124Z" fill="#b3202f"/>`;
+ if(c>=4) s+=`<circle cx="50" cy="62" r="48" fill="#ffc83d" opacity=".12"/>`;
+ s+=`<path d="M16 124 Q16 80 50 78 Q84 80 84 124Z" fill="${L.suit}"/>`;
+ s+=`<rect x="43" y="64" width="14" height="16" fill="${skin}"/>`;
+ if(c===0){ s+=`<path d="M36 78 Q50 94 64 78Z" fill="${skin}"/><path d="M40 84 Q50 100 60 84" fill="none" stroke="#e9eaff" stroke-width="1.5" opacity=".6"/>`; }
+ else { s+=`<path d="M38 78 L50 100 L62 78Z" fill="#f4f4f8"/>`; if(L.tie) s+=`<path d="M48 88 L52 88 L54 110 L50 117 L46 110Z" fill="${L.tie}"/>`; }
+ if(c>=4) s+=`<path d="M36 80 Q50 98 64 80" fill="none" stroke="#ffc83d" stroke-width="2"/>`;
+ s+=`<ellipse cx="50" cy="48" rx="22" ry="25" fill="${skin}"/>`;
+ s+=`<path d="M27 46 Q24 18 50 18 Q76 18 73 46 Q69 32 58 30 Q50 38 40 31 Q30 34 27 46Z" fill="${L.hair}"/>`;
+ [40,60].forEach(x=>{ s+=`<ellipse cx="${x}" cy="50" rx="4.2" ry="5" fill="#fff"/><circle cx="${x}" cy="51" r="2.8" fill="#2b3a67"/><circle cx="${x+1}" cy="49.5" r="1" fill="#fff"/>`; });
+ s+= c<3 ? `<path d="M35 44 L45 45 M55 45 L65 44" stroke="${L.hair}" stroke-width="1.6" fill="none"/>` : `<path d="M35 45 L45 42 M55 42 L65 45" stroke="${L.hair}" stroke-width="1.8" fill="none"/>`;
+ s+= c<3 ? `<path d="M44 62 Q50 66 56 62" stroke="#a5553b" stroke-width="1.6" fill="none"/>` : `<path d="M44 62 Q51 67 58 60" stroke="#a5553b" stroke-width="1.8" fill="none"/>`;
+ if(c>=2) s+=`<circle cx="40" cy="50" r="7" fill="none" stroke="#222" stroke-width="1.4"/><circle cx="60" cy="50" r="7" fill="none" stroke="#222" stroke-width="1.4"/><path d="M47 50 L53 50" stroke="#222" stroke-width="1.4"/>`;
+ if(c===8) s+=`<path d="M32 22 L36 4 L44 15 L50 2 L56 15 L64 4 L68 22Z" fill="#ffc83d" stroke="#b37a00" stroke-width="1"/>`;
+ return s+`</svg>`;
 }
 function spark(id){
  const s=Math.max(1,S.day-19), pts=[];
  for(let d=s;d<=S.day;d++)pts.push(price(id,d));
  const mn=Math.min(...pts),mx=Math.max(...pts),rg=(mx-mn)||1;
- const xy=pts.map((v,i)=>`${(i/(Math.max(1,pts.length-1)))*70},${28-((v-mn)/rg)*26}`).join(' ');
+ const xy=pts.map((v,i)=>`${((i/Math.max(1,pts.length-1))*70).toFixed(1)},${(28-((v-mn)/rg)*26).toFixed(1)}`).join(' ');
  const up=pts[pts.length-1]>=pts[0];
  return `<svg class="spark" viewBox="0 0 70 30"><polyline points="${xy}" fill="none" stroke="${up?'#35d07f':'#ff5d6c'}" stroke-width="2" stroke-linejoin="round"/></svg>`;
 }
@@ -181,22 +341,25 @@ function spark(id){
 // ---------- RENDER ----------
 function render(){
  const c=Math.max(0,S.chap), nw=netWorth(), ch=CH[c];
- const next=THRESH[Math.min(c+1,THRESH.length-1)], prev=THRESH[c];
- const pct=c>=5?100:Math.min(100,Math.max(0,(nw-prev)/(next-prev)*100));
+ const last=CH.length-1;
+ const next=THRESH[Math.min(c+1,last)], prev=THRESH[c];
+ const pct=c>=last?100:Math.min(100,Math.max(0,(nw-prev)/(next-prev)*100));
  const fs=foresight();
- const dir=fs.ch>=0?'rise':'fall';
+ const inc=Math.round(ch.inc*(1+S.rep/100));
+ const pass=bizIncome();
  let html=`
- <div class="hero">${skyline(c)}<div class="avatar">${ch.icon}</div>
+ <div class="hero">${skyline(c)}${character(c)}
   <div class="title"><b>${ch.name}</b><div>Day ${Math.min(S.day,DAYS)} / ${DAYS}</div></div></div>
  <div class="stats">
   <div class="stat nw"><small>NET WORTH</small><b>${fmt(nw)}</b></div>
   <div class="stat"><small>CASH</small><b>${fmt(S.cash)}</b></div>
   <div class="stat"><small>REPUTATION</small><b>⭐ ${Math.round(S.rep)}</b></div>
  </div>
+ <div class="chips"><span class="chip">🔥 ${S.streak}-day login streak</span><span class="chip">🏢 +${fmt(pass)}/day</span></div>
  <div class="bar"><i style="width:${pct}%"></i></div>
- <div class="goal">${c>=5?'You reached the top! 👑':'Next chapter at '+fmt(next)}</div>
+ <div class="goal">${c>=last?'You reached the top! 👑':'Next chapter at '+fmt(next)}</div>
  <div class="card fs"><small>🔮 TODAY'S FORESIGHT</small>
-  <div><b>${fs.a.icon} ${fs.a.name}</b> will <b class="${fs.ch>=0?'up':'dn'}">${dir} about ${Math.abs(Math.round(fs.ch*100))}%</b> over the next 3 days.</div></div>
+  <div><b>${fs.a.icon} ${fs.a.name}</b> will <b class="${fs.ch>=0?'up':'dn'}">${fs.ch>=0?'rise':'fall'} about ${Math.abs(Math.round(fs.ch*100))}%</b> over the next 3 days.</div></div>
  <div class="card"><h3>📈 Market</h3>`;
  ASSETS.forEach(a=>{
   const p=price(a.id), prevp=price(a.id,Math.max(1,S.day-1)), chg=(p/prevp-1)*100;
@@ -205,34 +368,54 @@ function render(){
    <div class="btns"><button class="b-buy" data-a="buy" data-v="${a.id}:.25">Buy 25%</button><button class="b-buy" data-a="buy" data-v="${a.id}:1">Buy All</button><button class="b-sell" data-a="sell" data-v="${a.id}">Sell All</button></div></div>
    <div style="text-align:right">${spark(a.id)}<small style="color:var(--mut)">${fmt(p)}</small></div></div>`;
  });
- const inc=Math.round(ch.inc*(1+S.rep/100));
  html+=`</div>
  <div class="card"><h3>⚡ Actions (${S.ap} left today)</h3>
   <div class="act">
    <button data-a="work" ${S.ap<1?'disabled':''}>💼 ${ch.work}<br><small>+${fmt(inc)}</small></button>
    <button data-a="net" ${S.ap<1?'disabled':''}>🤝 Network<br><small>+4 reputation</small></button>
   </div></div>
+ <div class="card"><h3>🏢 Businesses <small style="color:var(--mut);font-weight:400">(earn money every day)</small></h3>`;
+ BIZ.forEach(b=>{
+  const lv=S.biz[b.id]||0, locked=c<b.ch, cost=bizCost(b,lv), maxed=lv>=MAXLV;
+  html+=`<div class="biz ${locked?'locked':''}"><div class="ai">${b.icon}</div>
+   <div class="am"><b>${b.name}${lv?' · Lv '+lv:''}</b><small>${locked?'🔒 Unlocks in '+CH[b.ch].name.split(':')[0]:'+'+fmt(b.inc*Math.max(1,lv))+'/day'+(lv?'':' per level')}</small></div>
+   <button data-a="biz" data-v="${b.id}" ${(locked||maxed||S.cash<cost)?'disabled':''}>${maxed?'MAX':(lv?'Upgrade ':'Buy ')+fmt(cost)}</button></div>`;
+ });
+ html+=`</div>
  <div class="card"><button class="b-main" data-a="end">🌙 End Day ➜</button></div>
- <div class="card"><h3>📜 Story log</h3><div class="log">${S.log.map(x=>'• '+x).join('<br>')}</div></div>
+ <div class="row2"><button data-a="lb">🏆 Leaderboard</button><button data-a="invite">👥 Invite friends</button></div>
+ <div class="card"><h3>📜 Story log</h3><div class="log">${S.log.map(x=>'• '+esc(x)).join('<br>')}</div></div>
  <div class="card"><button data-a="reset" style="width:100%;background:#2a2f55">🔄 New life</button></div>`;
  if(modal) html+=modalHtml();
  document.getElementById('app').innerHTML=html;
 }
+function lbHtml(m){
+ let body='';
+ if(!API_URL) body=`<p>The online leaderboard isn't switched on yet.<br>Your best net worth: <b>${fmt(Math.max(S.best||0,netWorth()))}</b></p>`;
+ else if(!(tg&&tg.initData)) body=`<p>Open the game inside Telegram to see the leaderboard.</p>`;
+ else if(m.err) body=`<p>Couldn't load the leaderboard. Check your connection and try again.</p>`;
+ else if(!m.rows) body=`<p>Loading...</p>`;
+ else if(!m.rows.length) body=`<p>No players yet. Be the first!</p>`;
+ else body=(m.rank?`<p>Your rank: <b>#${m.rank}</b></p>`:'')+m.rows.map((r,i)=>`<div class="lb ${r.me?'me':''}"><div class="rk">${['🥇','🥈','🥉'][i]||(i+1)}</div><div class="nm">${esc(r.name||'Player')}</div><div class="vl">${fmt(Number(r.best_networth)||0)}</div></div>`).join('');
+ return body+`<button class="b-gold" data-a="close" style="text-align:center">Close</button>`;
+}
 function modalHtml(){
- const m=modal;
- if(m.result) return `<div class="modal"><div class="sheet"><div class="ch">${m.head}</div><p>${m.result}</p><button data-a="close" class="b-gold" style="text-align:center">Continue ➜</button></div></div>`;
- return `<div class="modal"><div class="sheet"><div class="ch">${m.head}</div><p>${m.text}</p>${m.choices.map((c,i)=>`<button data-a="choice" data-v="${i}">${c.l}</button>`).join('')}</div></div>`;
+ const m=modal; let inner;
+ if(m.lb) inner=lbHtml(m);
+ else if(m.choices) inner=`<p>${m.text}</p>`+m.choices.map((c,i)=>`<button data-a="choice" data-v="${i}">${c.l}</button>`).join('');
+ else inner=`<p>${m.text}</p><button class="b-gold" data-a="close" style="text-align:center">${m.btn||'Continue ➜'}</button>`;
+ return `<div class="modal"><div class="sheet"><div class="ch">${m.head}</div>${inner}</div></div>`;
 }
 
 // ---------- GAME LOGIC ----------
 function checkChapter(){
- if(modal||S.over&&S.chap>=5) return;
+ if(modal) return;
  const nw=netWorth();
  let t=-1; THRESH.forEach((v,i)=>{if(nw>=v)t=i});
  if(t>S.chap){
   S.chap++;
   const sc=CH[S.chap].scene;
-  modal={head:CH[S.chap].name,text:sc.text,choices:sc.choices,chap:S.chap};
+  showModal({head:CH[S.chap].name,text:sc.text,choices:sc.choices});
   haptic();
  }
 }
@@ -242,43 +425,92 @@ function applyEffect(e){
  if(e.rep) S.rep=Math.max(0,S.rep+e.rep);
  if(S.cash<0) S.cash=0;
 }
+function dailyCheck(){
+ const t=todayStr(); if(S.lastLogin===t) return;
+ const y=new Date(Date.now()-864e5).toLocaleDateString('en-CA');
+ S.streak = (S.lastLogin===y) ? (S.streak||0)+1 : 1;
+ S.lastLogin=t;
+ const c=Math.max(0,S.chap), k=Math.min(S.streak,7);
+ const reward=Math.round(CH[c].inc*2*k);
+ S.cash+=reward;
+ let extra=''; if(S.streak%7===0){ S.rep+=10; extra=' 🎉 7-day streak bonus: +10 ⭐'; }
+ addLog(`Daily reward (day ${S.streak} streak): +${fmt(reward)}.`);
+ showModal({head:'🎁 Daily reward',text:`Day ${S.streak} in a row! You received <b>${fmt(reward)}</b>. Come back tomorrow for a bigger reward (up to day 7).${extra}`,btn:'Collect ➜'});
+}
 function endDay(){
- if(S.over && S.day>=DAYS) return;
  S.day++; S.ap=3;
- const f=foresight();
- addLog(`Day ${S.day}: A new day begins.`);
+ const inc=bizIncome();
+ if(inc>0){ S.cash+=inc; addLog(`Day ${S.day}: your businesses earned ${fmt(inc)}.`); }
+ else addLog(`Day ${S.day}: A new day begins.`);
  if(Math.random()<.18){
   const ev=EVENTS[Math.floor(Math.random()*EVENTS.length)];
   applyEffect(ev); addLog(ev.t); toast(ev.t);
  }
+ S.best=Math.max(S.best||0,netWorth());
  if(S.day>=DAYS){
   S.over=true;
   const nw=netWorth();
-  const rank=nw>=1e7?'a legend 👑':nw>=1e6?'a millionaire 💎':nw>=1e5?'a rising tycoon 📈':'still hustling 💪';
-  modal={head:'One year later',result:`Your year is over. Final net worth: ${fmt(nw)} — you are ${rank}. Start a new life to try a different path!`,final:true};
+  const rank=nw>=1e9?'a legend 👑':nw>=1e8?'a world-class tycoon 🌍':nw>=1e7?'a business titan 💎':nw>=1e6?'a millionaire 💰':nw>=1e5?'a rising tycoon 📈':'still hustling 💪';
+  showModal({head:'One year later',text:`Your year is over. Final net worth: ${fmt(nw)} — you are ${rank}. Start a new life to try a different path!`,btn:'OK'});
  }
- haptic(); save(); checkChapter(); render();
+ haptic(); save(); checkChapter(); render(); syncPlayer();
 }
 function act(a,v){
  haptic();
- if(modal && a!=='choice' && a!=='close' && a!=='reset') return;
+ if(modal && a!=='choice' && a!=='close') return;
+ if(S.over && ['work','net','buy','sell','end','biz'].includes(a)){ toast('Your year is over — start a new life'); return; }
  if(a==='work'){ if(S.ap<1) return; S.ap--; const inc=Math.round(CH[Math.max(0,S.chap)].inc*(1+S.rep/100)); S.cash+=inc; addLog(`You earned ${fmt(inc)}.`); toast('+'+fmt(inc)); }
  else if(a==='net'){ if(S.ap<1) return; S.ap--; S.rep+=4; addLog('You networked. +4 reputation.'); toast('+4 ⭐'); }
  else if(a==='buy'){ const [id,pc]=v.split(':'); const spend=S.cash*parseFloat(pc); if(spend<1){toast('Not enough cash');return} S.hold[id]+=spend/price(id); S.cash-=spend; addLog(`Bought ${fmt(spend)} of ${ASSETS.find(x=>x.id===id).name}.`); }
  else if(a==='sell'){ const val=S.hold[v]*price(v); if(val<1){toast('Nothing to sell');return} S.cash+=val; S.hold[v]=0; addLog(`Sold ${ASSETS.find(x=>x.id===v).name} for ${fmt(val)}.`); }
+ else if(a==='biz'){
+  const b=BIZ.find(x=>x.id===v); if(!b) return;
+  const lv=S.biz[b.id]||0, cost=bizCost(b,lv);
+  if(Math.max(0,S.chap)<b.ch||lv>=MAXLV) return;
+  if(S.cash<cost){ toast('Not enough cash'); return; }
+  S.cash-=cost; S.biz[b.id]=lv+1; addLog(`${lv?'Upgraded':'Bought'} ${b.name} (Lv ${lv+1}) for ${fmt(cost)}.`); toast(b.icon+' '+b.name+' Lv '+(lv+1));
+ }
  else if(a==='end'){ endDay(); return; }
+ else if(a==='lb'){ openLeaderboard(); return; }
+ else if(a==='invite'){ invite(); return; }
  else if(a==='choice'){
   const c=modal.choices[+v]; applyEffect(c); addLog(c.l.replace(/^\S+\s/,'')+' — '+c.res);
-  modal={head:modal.head,result:c.res};
+  modal={head:modal.head,text:c.res};
   save(); render(); return;
  }
- else if(a==='close'){ const fin=modal&&modal.final; modal=null; save(); if(!fin) checkChapter(); render(); return; }
- else if(a==='reset'){ if(confirm('Start a brand-new life? Your progress will be lost.')){ S=newGame(); P=buildPrices(S.seed); modal=null; save(); checkChapter(); render(); } return; }
- save(); checkChapter(); render();
+ else if(a==='close'){ modal=queue.shift()||null; save(); if(!modal) checkChapter(); render(); return; }
+ else if(a==='reset'){
+  if(confirm('Start a brand-new life? Your current progress will be lost (your best score is kept).')){
+   S=newGame(S); P=buildPrices(S.seed); modal=null; queue=[]; save(); checkChapter(); render(); syncPlayer(true);
+  }
+  return;
+ }
+ save(); checkChapter(); render(); syncPlayer();
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]'); if(b&&!b.disabled) act(b.dataset.a,b.dataset.v)});
 
-checkChapter(); render();
+// ---------- START ----------
+function boot(){
+ if(booted) return; booted=true;
+ dailyCheck(); checkChapter(); save(); render(); initOnline();
+}
+(function(){
+ if(!cloudOn()){ boot(); return; }
+ document.getElementById('app').innerHTML='<div style="padding:60px 20px;text-align:center;color:#8f95c0">Loading your fortune...</div>';
+ const timer=setTimeout(boot,2500);
+ try{
+  tg.CloudStorage.getItem(CLOUD_KEY,function(err,val){
+   clearTimeout(timer);
+   if(!booted && !err && val){
+    try{
+     const c=JSON.parse(val);
+     if(c && c.seed && (c.ts||0)>(S.ts||0)){ const uid=S.uid; S=Object.assign(newGame(),c); S.uid=uid; if(!S.biz) S.biz={}; P=buildPrices(S.seed); }
+    }catch(e){}
+   }
+   boot();
+  });
+ }catch(e){ clearTimeout(timer); boot(); }
+})();
 </script>
 </body>
 </html>
